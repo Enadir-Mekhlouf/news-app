@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import CardNews from '../components/CardNews';
 import axios from 'axios';
 import SearchBar from '../components/SearchBar';
+import {socket} from '../../socket';
 const Home = () => {
   const [datanews, setData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,6 +37,29 @@ const Home = () => {
   useEffect(() => {
     fetchData();
   }, [page]);
+
+  useEffect(() => {
+    if (searchQuery == '') {
+      const handleMessage = data => {
+        console.log(data);
+      };
+
+      const handleNews = d => {
+        console.log(d);
+        setData(prevData => [d, ...prevData]); // Use functional update for prev state
+      };
+
+      // Register event listeners
+      socket.on('message', handleMessage);
+      socket.on('news', handleNews);
+
+      // Clean up the listeners
+      return () => {
+        socket.off('message', handleMessage);
+        socket.off('news', handleNews);
+      };
+    }
+  }, [socket]);
 
   const filteredNews = datanews.filter(newsItem =>
     newsItem.title.toLowerCase().includes(searchQuery.toLowerCase()),

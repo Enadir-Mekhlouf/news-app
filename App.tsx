@@ -9,9 +9,9 @@ const App = () => {
   return (
     <SafeAreaView
       style={{flex: 1, padding: 1, backgroundColor: 'white', width: '100%'}}>
-      {/* <Home /> */}
-      <LoginPage />
-      {/* <SignUP /> */}
+      <Home />
+      {/* <LoginPage />
+      <SignUP /> */}
     </SafeAreaView>
   );
 };
