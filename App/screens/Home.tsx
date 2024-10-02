@@ -1,4 +1,4 @@
-import {Text, TouchableOpacity, View} from 'react-native';
+import {FlatList, Text, TouchableOpacity, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import CardNews from '../components/CardNews';
 import axios from 'axios';
@@ -7,6 +7,7 @@ const Home = () => {
   const [datanews, setData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setpage] = useState(1);
+  const [loading, setLoading] = useState(false);
   const HandleLoadMore = () => {
     console.log('Load more');
     setpage(page => page + 1);
@@ -22,10 +23,13 @@ const Home = () => {
         const datanewsapi = response.data.data;
         const oldDtata = datanews;
         setData([...oldDtata, ...datanewsapi]);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setLoading(false);
       }
     };
+
     fetchData();
   }, [page]);
 
@@ -43,16 +47,36 @@ const Home = () => {
       {filteredNews.length > 0 &&
         filteredNews.map(newsItem => {
           return (
-            <CardNews
-              key={newsItem._id}
-              title={newsItem.title}
-              name={newsItem.source.name}
-              date={newsItem.pubDate}
+            // <CardNews
+            //   key={newsItem._id}
+            //   title={newsItem.title}
+            //   name={newsItem.source.name}
+            //   date={newsItem.pubDate}
+            // />
+            <FlatList
+              data={filteredNews}
+              renderItem={({item}) => (
+                <CardNews
+                  key={item._id}
+                  title={item.title}
+                  name={item.source.name}
+                  date={item.pubDate}
+                />
+              )}
+              keyExtractor={item => item._id}
+              onEndReached={HandleLoadMore}
+              onEndReachedThreshold={0.1}
+              contentContainerStyle={{paddingBottom: 20}}
             />
           );
         })}
       <TouchableOpacity
-        style={{backgroundColor: 'red', padding: 10, borderRadius: 13}}
+        style={{
+          backgroundColor: 'red',
+          padding: 10,
+          borderRadius: 13,
+          marginBottom: 20,
+        }}
         onPress={HandleLoadMore}>
         <Text style={{color: '#ffffff'}}>Load More Next Page</Text>
       </TouchableOpacity>

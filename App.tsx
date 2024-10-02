@@ -8,9 +8,7 @@ const App = () => {
   return (
     <SafeAreaView
       style={{flex: 1, padding: 1, backgroundColor: 'white', width: '100%'}}>
-      <ScrollView>
-        <Home />
-      </ScrollView>
+      <Home />
     </SafeAreaView>
   );
 };
