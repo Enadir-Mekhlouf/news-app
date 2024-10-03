@@ -2,14 +2,14 @@ import {View, Image, Text, TouchableOpacity} from 'react-native';
 import React from 'react';
 import imagepic from '../../assets/news.png';
 
-const CardNews = ({title, name, date}: any) => {
+const CardNews = ({title, name, date, backgroundcolorcard}: any) => {
   return (
     <View
       style={{
         justifyContent: 'center',
         alignItems: 'center',
         padding: 10,
-        backgroundColor: 'gray',
+        backgroundColor: backgroundcolorcard,
         width: '90%',
         borderRadius: 20,
         margin: 5,

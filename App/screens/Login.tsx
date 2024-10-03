@@ -1,21 +1,48 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Alert, Text, View} from 'react-native';
 import {SafeAreaView, StyleSheet} from 'react-native';
 import CustomTextInput from '../components/TextInput';
 import CustomButton from '../components/CustomButton';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const SignIN = ({navigation}: any) => {
   const [text, onChangeText] = React.useState('');
   const [Password, onChangePassword] = React.useState('');
+  const [Token, setToken] = React.useState<string | null>(null);
   const email = text;
   const password = Password;
+
+  // testing the if its stored or no
+
+  // useEffect(() => {
+  //   const fetchToken = async () => {
+  //     try {
+  //       const valueid = await AsyncStorage.getItem('userToken');
+  //       setToken(valueid);
+  //       console.log('userToken', valueid);
+  //     } catch (error) {
+  //       console.error('Error fetching the token:', error);
+  //     }
+  //   };
+
+  //   fetchToken(); // Call the async function inside useEffect
+  // }, []);
+
   const HandleSubmit = async () => {
     try {
       const response = await axios.post('http://10.0.2.2:5000/auth/login/', {
         email,
         password,
       });
-      console.log('Login successful:', response.data);
+      console.log('login sucess', response.data);
+      const {id, token} = response.data;
+      const useridtoken = {id, token};
+      console.log(id, token);
+
+      await AsyncStorage.setItem('userToken', token);
+      await AsyncStorage.setItem('userId', id);
+
+      navigation.navigate('Home', useridtoken);
       // Handle successful login here (e.g., save token, navigate to another screen)
     } catch (error) {
       console.error(
@@ -47,6 +74,8 @@ const SignIN = ({navigation}: any) => {
             <Text style={{fontSize: 30, color: '#050505'}}>Welcome Back !</Text>
           </View>
           <View>
+            <Text>here is the :{Token ? Token : ''}</Text>
+
             <Text style={{color: '#050505'}}>Username</Text>
             <CustomTextInput
               value={text}
@@ -68,7 +97,11 @@ const SignIN = ({navigation}: any) => {
         </View>
         <View style={styles.centeredView}>
           <View style={{padding: 5, width: 300}}>
-            <CustomButton title={'Start'} onPress={'hi'} theme={'primary'} />
+            <CustomButton
+              title={'Sign up'}
+              onPress={() => navigation.navigate('SignUp')}
+              theme={'primary'}
+            />
           </View>
 
           <View style={{padding: 5, width: 300}}>
