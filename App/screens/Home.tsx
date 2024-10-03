@@ -10,46 +10,49 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setpage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [seenNewsGuid, setSeenNewsGuid] = useState(null);
+  const [seenNewsGuid, setSeenNewsGuid] = useState([]);
+  const fetchseendata = async () => {
+    try {
+      const Token = await AsyncStorage.getItem('userToken');
+      const response = await axios.get(
+        `http://10.0.2.2:5000/user/newsSeen`,
+
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+          },
+        },
+      );
+      console.log('see data', response.data.news);
+      const ArrayOfNewsID = response.data.news;
+      setSeenNewsGuid(prevGuids => [...prevGuids, ...ArrayOfNewsID]);
+    } catch (error) {
+      console.error('Error fetching news seen:', error);
+    }
+  };
+  useEffect(() => {
+    fetchseendata();
+  }, []);
 
   const HandleSeeNews = async item => {
     const guid = item.guid;
     //console.log('see news', guid);
 
     try {
-      // Fetch the user token from AsyncStorage
       const Token = await AsyncStorage.getItem('userToken');
-      console.log('Fetched userToken:', Token);
+      //TODO:console.log('Fetched userToken:', Token);
 
       if (Token) {
         const response = await axios.put(
           `http://10.0.2.2:5000/api/news/${guid}`,
-          {}, // Pass an empty object as the body if you don't need to send anything
+          {},
           {
             headers: {
-              Authorization: `Bearer ${Token}`, // Include the token in the headers
+              Authorization: `Bearer ${Token}`,
             },
           },
         );
-
-        console.log('see data');
-        setSeenNewsGuid(guid);
-
-        try {
-          const response = await axios.get(
-            `http://10.0.2.2:5000/user/newsSeen`,
-
-            {
-              headers: {
-                Authorization: `Bearer ${Token}`,
-              },
-            },
-          );
-
-          setColorBackground('green');
-        } catch (error) {
-          console.error('Error fetching news seen:', error);
-        }
+        fetchseendata();
       } else {
         console.error('no user log in');
       }
@@ -133,7 +136,7 @@ const Home = () => {
               name={item.source.name}
               date={item.pubDate}
               backgroundcolorcard={
-                item.guid === seenNewsGuid ? 'green' : 'gray'
+                seenNewsGuid.includes(item.guid) ? 'green' : 'gray'
               }
             />
           </TouchableOpacity>
