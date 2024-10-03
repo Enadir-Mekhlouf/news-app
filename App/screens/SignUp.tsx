@@ -22,6 +22,7 @@ const SignUP = ({navigation}: any) => {
       });
       console.log('Signup successful:', response.data);
       // Handle successful signup (e.g., navigate to another screen or store token)
+      navigation.navigate('SignIn');
     } catch (error) {
       console.error(
         'Signup failed:',
